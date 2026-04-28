@@ -338,6 +338,13 @@ The script is not the creative brain. The agent decides:
 
 The Python script only performs deterministic pixel operations.
 
+For CLI processing, user-facing asset types are normalized into four script
+targets: `player`, `npc`, `creature`, and `asset`. Generic requests such as
+spells, projectiles, impacts, props, summons, and FX use `target=asset` with
+the appropriate mode. Freeform `mode=sheet` requires explicit `--rows` and
+`--cols`; otherwise use a named mode such as `cast`, `projectile`, `impact`,
+or `player_sheet`.
+
 ## Repository Layout
 
 ```text

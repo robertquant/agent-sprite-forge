@@ -28,6 +28,17 @@ Infer these from the user request:
 - `role`: only when the asset is clearly an NPC role
 - `name`: optional output slug
 
+The processor script uses a smaller set of normalized targets:
+
+- `player`: controllable overworld heroes and player walk sheets
+- `npc`: role-readable overworld NPCs
+- `creature`: monsters, beasts, bosses, spirits, and summons
+- `asset`: generic characters, spells, projectiles, impacts, props, and FX
+
+Map user-facing asset types such as `spell`, `projectile`, `impact`, `prop`,
+`summon`, and `fx` to processor target `asset`, then choose the appropriate
+mode, rows, columns, alignment, and component policy.
+
 Read [references/modes.md](references/modes.md) when the request is ambiguous.
 
 ## Agent Rules
@@ -160,6 +171,7 @@ For `spell_bundle` or `unit_bundle`, create one folder per asset in the bundle.
   - side-view asset -> `2x2`
 - use `shared_scale` by default for any multi-frame asset where frame-to-frame consistency matters
 - use `largest` component mode when detached sparkles or edge debris make the main body unstable
+- use `mode=sheet` only with explicit `--rows` and `--cols`; otherwise choose a named mode such as `cast`, `projectile`, `impact`, or `player_sheet`
 
 ## Resources
 

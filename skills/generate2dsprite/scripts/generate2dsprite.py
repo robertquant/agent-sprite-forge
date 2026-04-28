@@ -566,12 +566,15 @@ def split_grid(
 ) -> tuple[list[Image.Image], list[dict[str, object]]]:
     cleaned = remove_bg_magenta(img.convert("RGBA"), threshold, edge_threshold)
     width, height = cleaned.size
-    cell_width, cell_height = width // cols, height // rows
     cropped_frames: list[Image.Image] = []
     frame_info: list[dict[str, object]] = []
     for row in range(rows):
         for col in range(cols):
-            box = (col * cell_width, row * cell_height, (col + 1) * cell_width, (row + 1) * cell_height)
+            x0 = round(col * width / cols)
+            y0 = round(row * height / rows)
+            x1 = round((col + 1) * width / cols)
+            y1 = round((row + 1) * height / rows)
+            box = (x0, y0, x1, y1)
             frame = cleaned.crop(box)
             if trim_border_px > 0:
                 frame = trim_border(frame, px=trim_border_px)
@@ -597,7 +600,7 @@ def split_grid(
                     "selected_component_area": int(selected_component["area"]) if selected_component else None,
                     "selected_component_bbox": list(selected_component["bbox"]) if selected_component else None,
                     "crop_bbox": list(bbox) if bbox else None,
-                    "edge_touch": bbox_touches_edge(bbox, cell_width, cell_height, edge_touch_margin),
+                    "edge_touch": bbox_touches_edge(bbox, frame.width, frame.height, edge_touch_margin),
                 }
             )
 
@@ -748,8 +751,7 @@ def cmd_build_prompt(args: argparse.Namespace) -> None:
 
 
 def cmd_process(args: argparse.Namespace) -> None:
-    if args.target not in PROCESS_TARGETS:
-        raise ValueError(f"Unknown process target '{args.target}'. Valid targets: {', '.join(PROCESS_TARGETS)}")
+    ensure_valid_target_mode(args.target, args.mode)
     out_dir = args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -768,6 +770,8 @@ def cmd_process(args: argparse.Namespace) -> None:
     has_custom_grid = args.rows is not None or args.cols is not None
     if has_custom_grid and (args.rows is None or args.cols is None):
         raise ValueError("Custom grids require both --rows and --cols.")
+    if args.mode == "sheet" and not has_custom_grid:
+        raise ValueError("Mode 'sheet' requires explicit --rows and --cols.")
 
     if has_custom_grid or args.mode in GRID_SHAPES:
         if has_custom_grid:

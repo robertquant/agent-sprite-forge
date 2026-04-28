@@ -341,6 +341,12 @@ image_gen tileset + prop_pack_3x3 + layered_tilemap + separate_props + trigger_z
 
 Python script 不負責創意判斷，只負責穩定執行像素層級的處理。
 
+CLI 後處理時，使用者口語上的 asset type 會被整理成四種 script
+target：`player`、`npc`、`creature`、`asset`。像 spell、projectile、
+impact、prop、summon、FX 這類通用素材，都使用 `target=asset`，再搭配
+合適的 mode。自由格式的 `mode=sheet` 必須明確傳入 `--rows` 和 `--cols`；
+否則請使用 `cast`、`projectile`、`impact` 或 `player_sheet` 這類具名 mode。
+
 ## Repo 結構
 
 ```text
